@@ -3,7 +3,7 @@ const mongoose = require("mongoose")
 const dbConn = async () =>{
 
     try {
-            mongoose.connect("mongodb+srv://ahmeddouiri01:121200AD@cluster0.8gwkxsz.mongodb.net/personDB")
+            mongoose.connect(process.env.DB_URL)
             console.log("connected to DB")
 
     }

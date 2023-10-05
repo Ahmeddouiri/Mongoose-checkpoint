@@ -1,61 +1,67 @@
 const express = require("express")
 const dbConn = require("./config/dbConn")
-const personSchema = require("./Modeles/person")
-const person = require("./Modeles/person")
+const moviesSchema = require("./Modeles/movie")
+const movie = require("./Modeles/movie")
+var cors = require('cors')
+
+require('dotenv').config()
+
 
 
 //defifine port number & express module
 const app = express()
-const port = 5000
+const port = process.env.PORT
 
 // use json to be able to read json file
 app.use(express.json())
+app.use(cors())
+
 
 dbConn()
 
 app.get('/', async (req, res) => {
 
-  const person = await personSchema.find()
+  const person = await moviesSchema.find()
   res.status(200).send(person);
 })
   
 
-app.post('/addPerson', async (req, res) => {
+app.post('/addMovie', async (req, res) => {
   try {
-    const newperson = new personSchema(req.body)
-    await newperson.save();
-    res.status(200).send("Person created successfully")
+    const newmovie = new moviesSchema(req.body)
+    const response =await newmovie.save();
+    res.status(200).send(response)
   }
   catch (error) {
-    res.status(500).send("unable to add new person")
+    res.status(500).send("unable to add new Movie")
     console.log(error)
   }
 })
 
-app.get('/getPerson', async (req, res) => {
+app.get('/getMovies', async (req, res) => {
 
-  const person = await personSchema.find()
-  res.status(200).send(person);
+  const movie = await moviesSchema.find()
+  res.status(200).send(movie);
 })
 
-app.get('/getPersonById/:id', async (req, res) => {
+app.get('/getMovieById/:id', async (req, res) => {
   try {
     const { _id } = req.params;
-    const person = await personSchema.findById(_id)
-    person
-      ? res.status(200).send(person) :
+    const movie = await moviesSchema.findById(_id)
+    movie
+      ? res.status(200).send(movie) :
       res.status(404).send("cannot not found")
   }
   catch {
-    res.status(500).send("cannot get person")
+    res.status(500).send("cannot get Movies")
     console.log(error)
   }
 })
 // update from DB by Field
-app.put('/UpdatePersonByName/:name', (req, res) => {
+app.put('/UpdateMovieByName/:name', (req, res) => {
   try {
     const { name } = req.params
-    personSchema.findOneAndUpdate(
+    moviesSchema.findOneAndUpdate(
       {
         name: name  // search query
       },
@@ -68,7 +74,7 @@ app.put('/UpdatePersonByName/:name', (req, res) => {
       })
       .then(doc => {
         console.log(doc)
-        res.send({ result: "user updated", newuser: doc })
+        res.send({ result: "Movie updated", newuser: doc })
       })
       .catch(err => {
         console.error(err)
@@ -82,10 +88,10 @@ app.put('/UpdatePersonByName/:name', (req, res) => {
 })
 
 // update from DB by ID
-app.put('/UpdatePersonById/:id', (req, res) => {
+app.put('/UpdateMovieById/:id', (req, res) => {
   try {
     const { id } = req.params
-    personSchema.findByIdAndUpdate(
+    moviesSchema.findByIdAndUpdate(
 
       id,  // search query
 
@@ -102,7 +108,7 @@ app.put('/UpdatePersonById/:id', (req, res) => {
       })
       .then(doc => {
         console.log(doc)
-        res.send({ result: "user updated", newuser: doc })
+        res.send({ result: "Movie updated", newuser: doc })
       })
       .catch(err => {
         console.error(err)
@@ -117,10 +123,10 @@ app.put('/UpdatePersonById/:id', (req, res) => {
 
 // delete from DB by field
 
-app.delete('/DeletePersonbyName/:name', function (req, res) {
+app.delete('/DeleteMoviebyTitle/:name', function (req, res) {
   const { name } = req.params
 
-  personSchema.findOneAndRemove({
+  moviesSchema.findOneAndRemove({
     name: name
   })
     .then(response => {
@@ -138,10 +144,10 @@ app.delete('/DeletePersonbyName/:name', function (req, res) {
 //
 // delete from DB by ID
 
-app.delete('/DeletePersonbyId/:id', function (req, res) {
-  const { id } = req.params
-
-  personSchema.findByIdAndDelete(id)
+app.delete('/DeleteMoviebyId/:id', function (req, res) {
+  const {id} = req.params
+console.log(id);
+  moviesSchema.findByIdAndDelete(id)
     .then(response => {
       res.status(200).send("user delete")
       console.log(response)
